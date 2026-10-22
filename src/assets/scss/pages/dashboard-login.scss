@@ -1,0 +1,190 @@
+.agent-login {
+  align-items: center;
+  background-color: #07163a;
+  background-position: center;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  position: relative;
+}
+
+.agent-login__overlay {
+  background: linear-gradient(115deg, rgba(5, 18, 52, 0.72), rgba(13, 38, 91, 0.3));
+  inset: 0;
+  position: absolute;
+}
+
+.agent-login__card {
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 18px;
+  box-shadow: 0 24px 65px rgba(1, 12, 38, 0.38);
+  max-width: 530px;
+  padding: 2.35rem 2.1rem 2.1rem;
+  position: relative;
+  width: 100%;
+}
+
+.agent-login__header {
+  text-align: center;
+}
+
+.agent-login__logo {
+  display: block;
+  margin: 0 auto 1.15rem;
+  max-height: 145px;
+  max-width: 200px;
+  object-fit: contain;
+}
+
+.agent-login__title {
+  align-items: center;
+  color: #172554;
+  display: flex;
+  gap: 0.7rem;
+  justify-content: center;
+}
+
+.agent-login__title h1 {
+  font-size: 1.55rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.agent-login__header p {
+  color: #718096;
+  font-size: 0.92rem;
+  margin: 0.75rem 0 1.75rem;
+}
+
+.agent-login__form label {
+  color: #334155;
+  font-size: 0.94rem;
+  font-weight: 500;
+}
+
+.agent-login__error {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: 8px;
+  color: #be123c;
+  font-size: 0.88rem;
+  margin-bottom: 1.1rem;
+  padding: 0.75rem 0.9rem;
+}
+
+.agent-login__field {
+  align-items: center;
+  border: 1px solid #d9e0ea;
+  border-radius: 10px;
+  display: flex;
+  min-height: 54px;
+  padding-left: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.agent-login__field:focus-within {
+  border-color: #6961e9;
+  box-shadow: 0 0 0 3px rgba(105, 97, 233, 0.13);
+}
+
+.agent-login__field > svg {
+  color: #8b96a8;
+  flex: 0 0 auto;
+}
+
+.agent-login__field .form-control {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: #172554;
+  height: 52px;
+  padding-left: 0.8rem;
+}
+
+.agent-login__field .form-control:focus {
+  box-shadow: none;
+}
+
+.agent-login__password-toggle {
+  background: transparent;
+  border: 0;
+  color: #8b96a8;
+  cursor: pointer;
+  display: flex;
+  margin-right: 0.7rem;
+  padding: 0.35rem;
+}
+
+.agent-login__options {
+  align-items: center;
+  display: flex;
+  font-size: 0.88rem;
+  justify-content: space-between;
+  margin: 1.35rem 0 1.55rem;
+}
+
+.agent-login__options a {
+  color: #6259df;
+  font-weight: 500;
+}
+
+.agent-login__remember {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 0.38rem;
+  margin: 0;
+}
+
+.agent-login__remember input {
+  accent-color: #6259df;
+  height: 16px;
+  margin: 0;
+  width: 16px;
+}
+
+.agent-login__remember svg {
+  display: none;
+}
+
+.agent-login__submit.btn {
+  background: linear-gradient(100deg, #6259df, #7b70f6);
+  border: 0;
+  border-radius: 10px;
+  box-shadow: 0 10px 20px rgba(98, 89, 223, 0.25);
+  font-size: 1.05rem;
+  font-weight: 500;
+  padding: 0.95rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+
+.agent-login__submit.btn:hover,
+.agent-login__submit.btn:focus {
+  box-shadow: 0 13px 25px rgba(98, 89, 223, 0.32);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 480px) {
+  .agent-login {
+    padding: 1rem;
+  }
+
+  .agent-login__card {
+    border-radius: 14px;
+    padding: 1.8rem 1.25rem;
+  }
+
+  .agent-login__logo {
+    max-height: 120px;
+  }
+
+  .agent-login__options {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+}

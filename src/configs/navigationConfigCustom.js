@@ -1,0 +1,170 @@
+import React from "react"
+import * as Icon from "react-feather"
+
+const permissions = ["admin", "editor"]
+
+const navigationConfigCustom = [
+  {
+    id: "theme",
+    title: "Thème",
+    type: "item",
+    icon: <Icon.Layout size={20} />,
+    permissions,
+    navLink: "/theme"
+  },
+  {
+    id: "home",
+    title: "Accueil",
+    type: "item",
+    icon: <Icon.Home size={20} />,
+    permissions,
+    navLink: "/dashboard"
+  },
+  {
+    id: "agents",
+    title: "Agents",
+    type: "item",
+    icon: <Icon.Users size={20} />,
+    permissions,
+    navLink: "/agents"
+  },
+  {
+    id: "agences",
+    title: "Agences",
+    type: "item",
+    icon: <Icon.Home size={20} />,
+    permissions,
+    navLink: "/agences"
+  },
+  {
+    id: "entites",
+    title: "Éntités",
+    type: "collapse",
+    icon: <Icon.Map size={20} />,
+    children: [
+      {
+        id: "provinces-list",
+        title: "Liste des provinces",
+        type: "item",
+        icon: <Icon.Menu size={12} />,
+        permissions,
+        navLink: "/provinces"
+      },
+      {
+        id: "Villes-list",
+        title: "Liste des villes",
+        type: "item",
+        icon: <Icon.Menu size={12} />,
+        permissions,
+        navLink: "/villes"
+      },
+      {
+        id: "Communes-list",
+        title: "Liste des communes",
+        type: "item",
+        icon: <Icon.Menu size={12} />,
+        permissions,
+        navLink: "/communes"
+      }
+    ]
+  },
+  {
+    id: "donnees",
+    title: "Données",
+    type: "collapse",
+    icon: <Icon.Folder size={20} />,
+    children: [
+       {
+        id: "donnees-service",
+        title: "Service",
+        type: "item",
+        icon: <Icon.Menu size={12} />,
+        permissions,
+        navLink: "/services"
+      },
+      {
+        id: "donnees-operateur",
+        title: "Operateur",
+        type: "item",
+        icon: <Icon.Menu size={12} />,
+        permissions,
+        navLink: "/operateurs"
+      },
+      {
+        id: "donnees-currency",
+        title: "Devises",
+        type: "item",
+        icon: <Icon.Menu size={12} />,
+        permissions,
+        navLink: "/currencies"
+      }
+    ]
+  },
+  {
+    id: "operations",
+    title: "Operations",
+    type: "collapse",
+    icon: <Icon.CreditCard size={20} />,
+    children: [
+      {
+        id: "ligne-list",
+        title: "Lignes",
+        type: "item",
+        icon: <Icon.MapPin size={12} />,
+        permissions,
+        navLink: "/lignes"
+      },
+      {
+        id: "PrixLigne-list",
+        title: "Tarifs",
+        type: "item",
+        icon: <Icon.Menu size={12} />,
+        permissions,
+        navLink: "/prixlignes"
+      },
+         {
+        id: "TypeColis-list",
+        title: "TypeColis",
+        type: "item",
+        icon: <Icon.Menu size={12} />,
+        permissions,
+        navLink: "/colis"
+      },
+       {
+        id: "booking-list",
+        title: "Reservations",
+        type: "item",
+        icon: <Icon.Menu size={12} />,
+        permissions,
+        navLink: "/reservations"
+      }
+
+    ]
+  },
+  {
+    id: "administration",
+    title: "Administration",
+    type: "collapse",
+    icon: <Icon.Settings size={20} />,
+    children: [
+      {
+        id: "administration-utilisateurs",
+        title: "Utilisateurs",
+        type: "item",
+        icon: <Icon.Circle size={12} />,
+        permissions,
+        navLink: "/administration/utilisateurs"
+      },
+      {
+        id: "administration-roles",
+        title: "Rôles et permissions",
+        type: "item",
+        icon: <Icon.Circle size={12} />,
+        permissions,
+        navLink: "/administration/roles"
+      }
+    ]
+  }
+]
+
+export default navigationConfigCustom
