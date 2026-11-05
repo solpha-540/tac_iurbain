@@ -1,4 +1,4 @@
-import api from "./axiosConfig"
+import api from "../../services/api/urbainApi"
 
 // L'historique est déjà enrichi par l'API (agence, ligne, colis et paiements).
 export const getBookings = async () => {

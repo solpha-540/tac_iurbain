@@ -1,4 +1,4 @@
-import api from "./axiosConfig"
+import api from "../../services/api/urbainApi"
 
 const request = async (method, url, data, fallback) => {
   const response = await api({ method, url, data })

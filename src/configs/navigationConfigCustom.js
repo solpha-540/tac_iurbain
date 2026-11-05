@@ -26,7 +26,7 @@ const navigationConfigCustom = [
     type: "item",
     icon: <Icon.Users size={20} />,
     permissions,
-    navLink: "/agents"
+    navLink: "/agents-urbain"
   },
   {
     id: "agences",
@@ -147,6 +147,14 @@ const navigationConfigCustom = [
     type: "collapse",
     icon: <Icon.Settings size={20} />,
     children: [
+      {
+    id: "agents kisalu",
+    title: "Agents kisalu",
+    type: "item",
+    icon: <Icon.Users size={20} />,
+    permissions,
+    navLink: "/agents"
+     },
       {
         id: "administration-utilisateurs",
         title: "Utilisateurs",

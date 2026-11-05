@@ -1,4 +1,4 @@
-import api from "./axiosConfig"
+import api from "../../services/api/urbainApi"
 
 export const getProvinces = async () => {
   const response = await api.get("/resource/provinces")

@@ -112,5 +112,8 @@
       "last 1 safari version"
     ]
   },
-  "homepage": ""
+  "homepage": "",
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
 }

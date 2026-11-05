@@ -1,6 +1,7 @@
+import { getUrbainToken, getUrbainRefreshToken, clearUrbainTokens, clearKisaluTokens } from "../services/auth/tokenStorage"
 export const STORAGE_KEYS = Object.freeze({
-  token: "token",
-  refreshToken: "refreshToken",
+  token: "urbain_access_token",
+  refreshToken: "urbain_refresh_token",
   userId: "id_user_created",
   nom: "nom",
   prenom: "prenom",
@@ -39,12 +40,12 @@ const removeItem = key => {
 }
 
 export const setToken = token => setItem(STORAGE_KEYS.token, token)
-export const getToken = () => getItem(STORAGE_KEYS.token)
+export const getToken = getUrbainToken
 export const removeToken = () => removeItem(STORAGE_KEYS.token)
 
 export const setRefreshToken = refreshToken =>
   setItem(STORAGE_KEYS.refreshToken, refreshToken)
-export const getRefreshToken = () => getItem(STORAGE_KEYS.refreshToken)
+export const getRefreshToken = getUrbainRefreshToken
 export const removeRefreshToken = () => removeItem(STORAGE_KEYS.refreshToken)
 
 export const setUserId = userId => setItem(STORAGE_KEYS.userId, userId)
@@ -64,5 +65,7 @@ export const getRole = () => getItem(STORAGE_KEYS.role)
 export const removeRole = () => removeItem(STORAGE_KEYS.role)
 
 export const clearUserStorage = () => {
+  clearUrbainTokens()
+  clearKisaluTokens()
   Object.keys(STORAGE_KEYS).forEach(key => removeItem(STORAGE_KEYS[key]))
 }

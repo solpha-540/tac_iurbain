@@ -69,7 +69,7 @@ export const signupWithJWT = (email, password, name) => {
 
           loggedInUser = response.data.user
 
-          localStorage.setItem("token", response.data.token)
+          // Inscription de démonstration : aucune session API métier à enregistrer.
 
           dispatch({
             type: "LOGIN_WITH_JWT",
@@ -80,7 +80,7 @@ export const signupWithJWT = (email, password, name) => {
         }
 
       })
-      .catch(err => console.log(err))
+      .catch(() => { throw new Error("Impossible de terminer cette inscription de démonstration.") })
 
   }
 }

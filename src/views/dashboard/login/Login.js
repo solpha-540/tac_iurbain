@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { Button, Form, FormGroup, Input, Label } from "reactstrap"
 import { Eye, EyeOff, Lock, Phone, User } from "react-feather"
 import { connect } from "react-redux"
-import { loginAgent } from "../../../redux/actions/auth/loginActions"
+import { loginUrbain } from "../../../redux/actions/auth/loginActions"
 import logo from "../../../assets/img/logo/logo.png"
 import background from "../../../assets/img/backgrounds/back.jpg"
 import "../../../assets/scss/pages/dashboard-login.scss"
@@ -23,7 +23,7 @@ class Login extends React.Component {
     this.setState({ error: "", isSubmitting: true })
 
     try {
-      await this.props.loginAgent({
+      await this.props.loginUrbain({
         login: this.state.phone,
         pwd: this.state.password
       })
@@ -116,4 +116,4 @@ class Login extends React.Component {
   }
 }
 
-export default connect(null, { loginAgent })(Login)
+export default connect(null, { loginUrbain })(Login)

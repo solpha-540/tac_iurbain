@@ -1,4 +1,4 @@
-import api from "./axiosConfig"
+import api from "../../services/api/urbainApi"
 import { getVilles } from "./VilleService"
 
 const request = async (method, url, data, fallback) => {
