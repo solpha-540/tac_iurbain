@@ -1,10 +1,12 @@
+import SearchInput from "../../../../components/urbain/SearchInput"
+import WorkspacePage from "../../../../components/urbain/WorkspacePage"
 import React, { useMemo, useState } from "react"
 import {
   Alert, Badge, Button, Card, CardBody, CardHeader, CardTitle, Form,
   FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter,
   ModalHeader, Spinner,
 } from "reactstrap"
-import DataTable from "react-data-table-component"
+import DataTable from "../../../../components/urbain/BusinessTable"
 import { Edit2, Plus, RefreshCw, Search, Trash2 } from "react-feather"
 import { PrixLigneProvider, usePrixLignes } from "../../../../contexts/Prix_ligneContext"
 import { getUserId } from "../../../../utility/utlitaire"
@@ -162,7 +164,7 @@ const PrixLigneTable = () => {
     { name: "Prix fret", selector: "prix_fret", cell: row => currency(row.prix_fret) },
     { name: "Prix courrier", selector: "prix_courrier", cell: row => currency(row.prix_courrier) },
     { name: "Fret offert", selector: "fret_offert", cell: row => currency(row.fret_offert) },
-    { name: "Actions", button: true, width: "100px", cell: row => <div><Button.Ripple color="flat-primary" className="btn-icon p-0 mr-50" onClick={() => openEdit(row)} title="Modifier"><Edit2 size={17} /></Button.Ripple><Button.Ripple color="flat-danger" className="btn-icon p-0" onClick={() => { setSelected(row); ctx.clearError(); setModal("delete") }} title="Supprimer"><Trash2 size={17} /></Button.Ripple></div> },
+    { name: "Actions", button: true, width: "100px", cell: row => <div><Button.Ripple color="flat-primary" className="btn-icon p-0 mr-50" onClick={() => openEdit(row)} title="Modifier" aria-label="Modifier"  ><Edit2 size={17} /></Button.Ripple><Button.Ripple color="flat-danger" className="btn-icon p-0" onClick={() => { setSelected(row); ctx.clearError(); setModal("delete") }} title="Supprimer" aria-label="Supprimer"  ><Trash2 size={17} /></Button.Ripple></div> },
   ], [ctx.agences])
 
   return (
@@ -177,17 +179,20 @@ const PrixLigneTable = () => {
       <CardBody>
         {success && <Alert color="success" toggle={() => setSuccess("")}>{success}</Alert>}
         {ctx.error && <Alert color="danger">{ctx.error}</Alert>}
-        <div className="position-relative has-icon-left col-12 col-md-4 px-0 ml-auto mb-1"><Input value={search} onChange={event => setSearch(event.target.value)} placeholder="Rechercher un tarif" /><div className="form-control-position"><Search size={15} /></div></div>
+        <div className="position-relative has-icon-left col-12 col-md-4 px-0 ml-auto mb-1"><SearchInput value={search} onChange={event => setSearch(event.target.value)} placeholder="Rechercher un tarif"  aria-label="Rechercher un tarif" /><div className="form-control-position"><Search size={15} /></div></div>
         <DataTable data={filteredRows} columns={columns} noHeader pagination progressPending={ctx.loading} progressComponent={<Spinner color="primary" className="my-2" />} noDataComponent="Aucun tarif trouvé." />
       </CardBody>
-      <Modal isOpen={modal === "form"} toggle={close} centered><Form onSubmit={save}><ModalHeader toggle={close}>{selected ? "Modifier" : "Ajouter"} un tarif</ModalHeader><ModalBody>{(errors.user || ctx.error) && <Alert color="danger">{errors.user || ctx.error}</Alert>}<TarifFields form={form} setForm={setForm} errors={errors} ctx={ctx} /></ModalBody><ModalFooter><Button color="secondary" outline type="button" onClick={close} disabled={ctx.saving}>Annuler</Button><Button.Ripple color="primary" type="submit" disabled={ctx.saving}>{ctx.saving ? <Spinner size="sm" /> : "Enregistrer"}</Button.Ripple></ModalFooter></Form></Modal>
-      <Modal isOpen={modal === "delete"} toggle={close} centered><ModalHeader toggle={close}>Supprimer un tarif</ModalHeader><ModalBody>{ctx.error && <Alert color="danger">{ctx.error}</Alert>}Voulez-vous vraiment supprimer le tarif de la ligne <strong>{selected && selected._line}</strong> ?</ModalBody><ModalFooter><Button color="secondary" outline onClick={close} disabled={ctx.saving}>Annuler</Button><Button.Ripple color="danger" onClick={remove} disabled={ctx.saving}>{ctx.saving ? <Spinner size="sm" /> : "Supprimer"}</Button.Ripple></ModalFooter></Modal>
+      <Modal isOpen={modal === "form"} toggle={close} centered className="urbain-dialog" ><Form onSubmit={save}><ModalHeader toggle={close}>{selected ? "Modifier" : "Ajouter"} un tarif</ModalHeader><ModalBody>{(errors.user || ctx.error) && <Alert color="danger">{errors.user || ctx.error}</Alert>}<TarifFields form={form} setForm={setForm} errors={errors} ctx={ctx} /></ModalBody><ModalFooter><Button color="secondary" outline type="button" onClick={close} disabled={ctx.saving}>Annuler</Button><Button.Ripple color="primary" type="submit" disabled={ctx.saving}>{ctx.saving ? <Spinner size="sm" /> : "Enregistrer"}</Button.Ripple></ModalFooter></Form></Modal>
+      <Modal isOpen={modal === "delete"} toggle={close} centered className="urbain-dialog" ><ModalHeader toggle={close}>Supprimer un tarif</ModalHeader><ModalBody>{ctx.error && <Alert color="danger">{ctx.error}</Alert>}Voulez-vous vraiment supprimer le tarif de la ligne <strong>{selected && selected._line}</strong> ?</ModalBody><ModalFooter><Button color="secondary" outline onClick={close} disabled={ctx.saving}>Annuler</Button><Button.Ripple color="danger" onClick={remove} disabled={ctx.saving}>{ctx.saving ? <Spinner size="sm" /> : "Supprimer"}</Button.Ripple></ModalFooter></Modal>
     </Card>
   )
 }
 
-export default () => (
+const WorkspaceContent = () => (
   <PrixLigneProvider>
     <PrixLigneTable />
   </PrixLigneProvider>
 )
+
+const WorkspaceContentWorkspace = () => <WorkspacePage title="Tarifs de transport" description="Consultez et ajustez les tarifs associés à vos lignes et à vos colis." category="Transport" links={[{"label":"Lignes","to":"/lignes"},{"label":"Types de colis","to":"/colis"}]}><WorkspaceContent /></WorkspacePage>
+export default WorkspaceContentWorkspace

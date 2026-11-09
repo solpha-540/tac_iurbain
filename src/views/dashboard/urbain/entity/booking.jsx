@@ -1,9 +1,11 @@
+import SearchInput from "../../../../components/urbain/SearchInput"
+import WorkspacePage from "../../../../components/urbain/WorkspacePage"
 import React, { useMemo, useState } from "react"
 import {
   Alert, Badge, Button, Card, CardBody, CardHeader, CardTitle, Col, Input,
   Modal, ModalBody, ModalFooter, ModalHeader, Row, Spinner,
 } from "reactstrap"
-import DataTable from "react-data-table-component"
+import DataTable from "../../../../components/urbain/BusinessTable"
 import {
   Box, Calendar, ChevronRight, CreditCard, MapPin, Package, RefreshCw, Search,
   Tag, Truck,
@@ -47,7 +49,7 @@ const BookingDetails = ({ booking, close }) => {
   const currency = (((booking.historique_paiements || [])[0] || {}).currency_symbol) || "FC"
   const payments = booking.historique_paiements || []
 
-  return <Modal isOpen={Boolean(booking)} toggle={close} centered size="lg">
+  return <Modal isOpen={Boolean(booking)} toggle={close} centered size="lg" className="urbain-dialog" >
     <ModalHeader toggle={close}>Détail de la réservation #{booking.id_reservation || "—"}</ModalHeader>
     <ModalBody>
       <div className="d-flex flex-wrap justify-content-between align-items-center bg-light rounded p-1 mb-2">
@@ -102,11 +104,12 @@ const BookingTable = () => {
     <Row><Metric icon={Tag} label="Réservations" value={summary.total} /><Metric icon={CreditCard} label="Montant encaissé" value={money(summary.paid)} color="success" /><Metric icon={Calendar} label="En attente" value={summary.pending} color="warning" /><Metric icon={Box} label="Colis" value={summary.parcels} color="info" /></Row>
     <Card className="shadow-sm border-0">
       <CardHeader className="d-flex flex-wrap align-items-center justify-content-between pb-1"><div><CardTitle tag="h4" className="mb-25">Historique des réservations</CardTitle><small className="text-muted">Suivez les réservations, paiements et colis en temps réel.</small></div><Button.Ripple outline color="primary" size="sm" onClick={fetchBookings} disabled={loading} className="mt-1 mt-sm-0"><RefreshCw size={15} className={`mr-50 ${loading ? "fa-spin" : ""}`} />Actualiser</Button.Ripple></CardHeader>
-      <CardBody>{error && <Alert color="danger" className="mb-2">{error}</Alert>}<div className="position-relative has-icon-left col-12 col-md-5 px-0 mb-2"><Input value={search} onChange={event => setSearch(event.target.value)} placeholder="Rechercher un ticket, trajet ou une agence" /><div className="form-control-position"><Search size={15} /></div></div><DataTable columns={columns} data={filteredBookings} noHeader pagination highlightOnHover responsive progressPending={loading} progressComponent={<Spinner color="primary" className="my-2" />} noDataComponent={error ? "" : "Aucune réservation trouvée."} /></CardBody>
+      <CardBody>{error && <Alert color="danger" className="mb-2">{error}</Alert>}<div className="position-relative has-icon-left col-12 col-md-5 px-0 mb-2"><SearchInput value={search} onChange={event => setSearch(event.target.value)} placeholder="Rechercher un ticket, trajet ou une agence"  aria-label="Rechercher un ticket, trajet ou une agence" /><div className="form-control-position"><Search size={15} /></div></div><DataTable columns={columns} data={filteredBookings} noHeader pagination highlightOnHover responsive progressPending={loading} progressComponent={<Spinner color="primary" className="my-2" />} noDataComponent={error ? "" : "Aucune réservation trouvée."} /></CardBody>
     </Card>
     <BookingDetails booking={selectedBooking} close={() => setSelectedBooking(null)} />
   </>
 }
 
 const Booking = () => <BookingProvider><BookingTable /></BookingProvider>
-export default Booking
+const BookingWorkspace = () => <WorkspacePage title="Réservations" description="Suivez les trajets, les colis et les paiements de vos réservations." category="Opérations" links={[{"label":"Agences","to":"/agences"},{"label":"Tarifs","to":"/prixlignes"}]}><Booking /></WorkspacePage>
+export default BookingWorkspace

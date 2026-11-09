@@ -50,7 +50,7 @@ const AgentActionModal = ({ agent, action, submitAction, close, onSuccess }) => 
     }
     if (done) onSuccess()
   }
-  return <Modal isOpen centered toggle={toggle} backdrop={saving ? "static" : true} keyboard={!saving}>
+  return <Modal className="urbain-dialog" isOpen centered toggle={toggle} backdrop={saving ? "static" : true} keyboard={!saving}>
     <Form onSubmit={submit}>
       <ModalHeader toggle={saving ? undefined : toggle}>{assignment ? "Affecter un agent" : "Créer un compte"}</ModalHeader>
       <ModalBody>

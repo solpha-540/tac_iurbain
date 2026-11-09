@@ -1,3 +1,5 @@
+import SearchInput from "../../../../components/urbain/SearchInput"
+import WorkspacePage from "../../../../components/urbain/WorkspacePage"
 import React, { useMemo, useState } from "react";
 import {
   Alert,
@@ -32,7 +34,7 @@ import {
   Search,
   Trash2,
 } from "react-feather";
-import DataTable from "react-data-table-component";
+import DataTable from "../../../../components/urbain/BusinessTable";
 import { Link } from "react-router-dom";
 import { LigneProvider, useLignes } from "../../../../contexts/LigneContext";
 import { getUserId } from "../../../../utility/utlitaire";
@@ -332,7 +334,7 @@ const LigneTable = () => {
               color="flat-primary"
               className="btn-icon p-0 mr-50"
               onClick={() => openEdit(r)}
-            >
+             aria-label="Modifier" title="Modifier" >
               <Edit2 size={17} />
             </Button.Ripple>
             {!isSecondary && (
@@ -344,7 +346,7 @@ const LigneTable = () => {
                   setTab("secondaires");
                 }}
                 title="Voir les secondaires"
-              >
+               aria-label="Voir les détails"  >
                 <Eye size={17} />
               </Button.Ripple>
             )}
@@ -356,7 +358,7 @@ const LigneTable = () => {
                 ctx.clearActionError();
                 setModal("delete");
               }}
-            >
+             aria-label="Supprimer" title="Supprimer" >
               <Trash2 size={17} />
             </Button.Ripple>
           </div>
@@ -449,11 +451,11 @@ const LigneTable = () => {
               </FormGroup>
             )}
             <div className="position-relative has-icon-left col-12 col-md-4 px-0 ml-auto mb-1">
-              <Input
+              <SearchInput
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Rechercher une ligne"
-              />
+               aria-label="Rechercher une ligne" />
               <div className="form-control-position">
                 <Search size={15} />
               </div>
@@ -470,7 +472,7 @@ const LigneTable = () => {
           </TabPane>
         </TabContent>
       </CardBody>
-      <Modal isOpen={modal === "form"} toggle={() => setModal(null)} centered>
+      <Modal isOpen={modal === "form"} toggle={() => setModal(null)} centered className="urbain-dialog" >
         <Form onSubmit={save}>
           <ModalHeader toggle={() => setModal(null)}>
             {selected ? "Modifier" : "Ajouter"} une ligne{" "}
@@ -500,7 +502,7 @@ const LigneTable = () => {
           </ModalFooter>
         </Form>
       </Modal>
-      <Modal isOpen={modal === "delete"} toggle={() => setModal(null)} centered>
+      <Modal isOpen={modal === "delete"} toggle={() => setModal(null)} centered className="urbain-dialog" >
         <ModalHeader toggle={() => setModal(null)}>
           Supprimer une ligne
         </ModalHeader>
@@ -526,8 +528,11 @@ const LigneTable = () => {
     </Card>
   );
 };
-export default () => (
+const WorkspaceContent = () => (
   <LigneProvider>
     <LigneTable />
   </LigneProvider>
 );
+
+const WorkspaceContentWorkspace = () => <WorkspacePage title="Lignes et destinations" description="Organisez les itinéraires principaux et leurs destinations secondaires." category="Transport" links={[{"label":"Agences","to":"/agences"},{"label":"Tarifs","to":"/prixlignes"}]}><WorkspaceContent /></WorkspacePage>
+export default WorkspaceContentWorkspace

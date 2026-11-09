@@ -1,10 +1,12 @@
+import SearchInput from "../../../../components/urbain/SearchInput"
+import WorkspacePage from "../../../../components/urbain/WorkspacePage"
 import React, { useMemo, useState } from "react"
 import {
   Alert, Button, Card, CardBody, CardHeader, CardTitle, Form, FormFeedback,
   FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Spinner
 } from "reactstrap"
 import { Edit2, MapPin, Plus, RefreshCw, Search, Trash2 } from "react-feather"
-import DataTable from "react-data-table-component"
+import DataTable from "../../../../components/urbain/BusinessTable"
 import { VilleProvider, useVilles } from "../../../../contexts/VilleContext"
 import { CommuneProvider, useCommunes } from "../../../../contexts/CommuneContext"
 import { getUserId } from "../../../../utility/utlitaire"
@@ -196,13 +198,13 @@ const CommuneTable = () => {
         {successMessage ? <Alert color="success" toggle={() => setSuccessMessage("")}>{successMessage}</Alert> : null}
         {error ? <Alert color="danger">{error}</Alert> : null}
         <div className="d-flex justify-content-end mb-1"><div className="position-relative has-icon-left col-12 col-md-4 px-0">
-          <Input value={search} onChange={event => setSearch(event.target.value)} placeholder="Rechercher une Commune" />
+          <SearchInput value={search} onChange={event => setSearch(event.target.value)} placeholder="Rechercher une Commune"  aria-label="Rechercher une Commune" />
           <div className="form-control-position"><Search size={15} /></div>
         </div></div>
         <DataTable data={filteredCommunes} columns={columns} noHeader pagination progressPending={loading} progressComponent={<Spinner color="primary" className="my-2" />} noDataComponent="Aucune Commune trouvée." />
       </CardBody>
 
-      <Modal isOpen={isCreateModalOpen} toggle={toggleCreateModal} centered>
+      <Modal isOpen={isCreateModalOpen} toggle={toggleCreateModal} centered className="urbain-dialog" >
         <Form onSubmit={handleCreateCommune}>
           <ModalHeader toggle={toggleCreateModal}>Ajouter une Commune</ModalHeader>
           <ModalBody>
@@ -214,7 +216,7 @@ const CommuneTable = () => {
         </Form>
       </Modal>
 
-      <Modal isOpen={isEditModalOpen} toggle={toggleEditModal} centered>
+      <Modal isOpen={isEditModalOpen} toggle={toggleEditModal} centered className="urbain-dialog" >
         <Form onSubmit={handleUpdateCommune}>
           <ModalHeader toggle={toggleEditModal}>Modifier une Commune</ModalHeader>
           <ModalBody>
@@ -226,7 +228,7 @@ const CommuneTable = () => {
         </Form>
       </Modal>
 
-      <Modal isOpen={isDeleteModalOpen} toggle={toggleDeleteModal} centered>
+      <Modal isOpen={isDeleteModalOpen} toggle={toggleDeleteModal} centered className="urbain-dialog" >
         <ModalHeader toggle={toggleDeleteModal}>Supprimer une Commune</ModalHeader>
         <ModalBody>{deleteError ? <Alert color="danger">{deleteError}</Alert> : null}Voulez-vous vraiment supprimer cette Commune ?</ModalBody>
         <ModalFooter><Button color="secondary" outline onClick={toggleDeleteModal} disabled={deleting}>Annuler</Button><Button.Ripple color="danger" onClick={handleDeleteCommune} disabled={deleting}>{deleting ? <Spinner size="sm" className="mr-50" /> : <Trash2 size={15} className="mr-50" />}Supprimer</Button.Ripple></ModalFooter>
@@ -237,4 +239,5 @@ const CommuneTable = () => {
 
 const Commune = () => <VilleProvider><CommuneProvider><CommuneTable /></CommuneProvider></VilleProvider>
 
-export default Commune
+const CommuneWorkspace = () => <WorkspacePage title="Communes" description="Gérez les communes qui composent les adresses de vos agences." category="Territoires" links={[{"label":"Villes","to":"/villes"},{"label":"Agences","to":"/agences"}]}><Commune /></WorkspacePage>
+export default CommuneWorkspace

@@ -38,7 +38,7 @@ const navigationConfigCustom = [
   },
   {
     id: "entites",
-    title: "Éntités",
+    title: "Territoires",
     type: "collapse",
     icon: <Icon.Map size={20} />,
     children: [
@@ -76,7 +76,7 @@ const navigationConfigCustom = [
     children: [
        {
         id: "donnees-service",
-        title: "Service",
+        title: "Services",
         type: "item",
         icon: <Icon.Menu size={12} />,
         permissions,
@@ -84,7 +84,7 @@ const navigationConfigCustom = [
       },
       {
         id: "donnees-operateur",
-        title: "Operateur",
+        title: "Opérateurs de paiement",
         type: "item",
         icon: <Icon.Menu size={12} />,
         permissions,
@@ -102,7 +102,7 @@ const navigationConfigCustom = [
   },
   {
     id: "operations",
-    title: "Operations",
+    title: "Opérations",
     type: "collapse",
     icon: <Icon.CreditCard size={20} />,
     children: [
@@ -124,7 +124,7 @@ const navigationConfigCustom = [
       },
          {
         id: "TypeColis-list",
-        title: "TypeColis",
+        title: "Types de colis",
         type: "item",
         icon: <Icon.Menu size={12} />,
         permissions,
@@ -132,7 +132,7 @@ const navigationConfigCustom = [
       },
        {
         id: "booking-list",
-        title: "Reservations",
+        title: "Réservations",
         type: "item",
         icon: <Icon.Menu size={12} />,
         permissions,

@@ -82,7 +82,7 @@ const CreateAgentUrbainModal = ({ close, createAgent, onCreated }) => {
   const results = query.trim().length >= 2 ? source.filter(agent => matchesKisaluAgent(agent, query)) : []
   const toggle = () => { if (!submitting.current) close() }
   return (
-    <Modal isOpen toggle={toggle} centered size="lg" backdrop={saving ? "static" : true} keyboard={!saving}>
+    <Modal className="urbain-dialog" isOpen toggle={toggle} centered size="lg" backdrop={saving ? "static" : true} keyboard={!saving}>
       <Form onSubmit={submit}>
         <ModalHeader toggle={saving ? undefined : toggle}>Créer un agent depuis Kisalu</ModalHeader>
         <ModalBody>

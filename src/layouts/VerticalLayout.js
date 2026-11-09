@@ -1,3 +1,4 @@
+import "../assets/scss/pages/urbain-workspace.scss";
 import React, { PureComponent } from "react";
 import classnames from "classnames";
 import Customizer from "../components/@vuexy/customizer/Customizer";
@@ -252,7 +253,7 @@ class VerticalLayout extends PureComponent {
     return (
       <div
         className={classnames(
-          `wrapper vertical-layout theme-${appProps.menuTheme}`,
+          `urbain-workspace wrapper vertical-layout theme-${appProps.menuTheme}`,
           {
             "menu-collapsed":
               this.state.collapsedContent === true && this.state.width >= 1200,

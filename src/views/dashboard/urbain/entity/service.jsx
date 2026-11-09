@@ -1,7 +1,9 @@
+import SearchInput from "../../../../components/urbain/SearchInput"
+import WorkspacePage from "../../../../components/urbain/WorkspacePage"
 import React, { useMemo, useState } from "react"
 import { Alert, Badge, Button, Card, CardBody, CardHeader, CardTitle, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Spinner } from "reactstrap"
 import { Briefcase, Edit2, Plus, RefreshCw, Search, Trash2 } from "react-feather"
-import DataTable from "react-data-table-component"
+import DataTable from "../../../../components/urbain/BusinessTable"
 import { ServiceProvider, useServices } from "../../../../contexts/ServiceContext"
 import { getUserId } from "../../../../utility/utlitaire"
 
@@ -64,7 +66,7 @@ const ServiceTable = () => {
     { name: "Service", selector: "libelle", sortable: true, cell: row => <span className="d-flex align-items-center"><Briefcase size={16} className="text-primary mr-50" />{row.libelle || "-"}</span> },
     { name: "Statut", selector: "status", sortable: true, cell: row => <Badge color={statusColor(row.status)} pill>{statusLabel(row.status)}</Badge> },
     { name: "Agences associées", sortable: true, minWidth: "220px", cell: row => agencies(row).length ? <div>{agencies(row).map(agency => <Badge color="light-primary" className="mr-50 mb-25" key={agency.id}>{agency.nom || `Agence #${agency.id}`}</Badge>)}</div> : <span className="text-muted">Aucune agence</span> },
-    { name: "Actions", ignoreRowClick: true, allowOverflow: true, button: true, width: "120px", cell: row => <div className="actions d-flex align-items-center"><Button.Ripple color="flat-primary" className="btn-icon p-0 mr-50" onClick={() => onEdit(row)} title="Modifier"><Edit2 size={17} /></Button.Ripple><Button.Ripple color="flat-danger" className="btn-icon p-0" onClick={() => { setSelected(row); clearDeleteError(); setDeleteOpen(true) }} title="Supprimer"><Trash2 size={17} /></Button.Ripple></div> },
+    { name: "Actions", ignoreRowClick: true, allowOverflow: true, button: true, width: "120px", cell: row => <div className="actions d-flex align-items-center"><Button.Ripple color="flat-primary" className="btn-icon p-0 mr-50" onClick={() => onEdit(row)} title="Modifier" aria-label="Modifier"  ><Edit2 size={17} /></Button.Ripple><Button.Ripple color="flat-danger" className="btn-icon p-0" onClick={() => { setSelected(row); clearDeleteError(); setDeleteOpen(true) }} title="Supprimer" aria-label="Supprimer"  ><Trash2 size={17} /></Button.Ripple></div> },
   ], [])
   const filtered = services.filter(service => [service.id, service.libelle, service.status, ...agencies(service).map(agency => agency.nom)].some(value => String(value || "").toLowerCase().includes(search.toLowerCase())))
 
@@ -73,14 +75,15 @@ const ServiceTable = () => {
     <CardBody>
       {successMessage && <Alert color="success" toggle={() => setSuccessMessage("")}>{successMessage}</Alert>}
       {error && <Alert color="danger">{error}</Alert>}
-      <div className="d-flex justify-content-end mb-1"><div className="position-relative has-icon-left col-12 col-md-4 px-0"><Input value={search} onChange={event => setSearch(event.target.value)} placeholder="Rechercher un service" /><div className="form-control-position"><Search size={15} /></div></div></div>
+      <div className="d-flex justify-content-end mb-1"><div className="position-relative has-icon-left col-12 col-md-4 px-0"><SearchInput value={search} onChange={event => setSearch(event.target.value)} placeholder="Rechercher un service"  aria-label="Rechercher un service" /><div className="form-control-position"><Search size={15} /></div></div></div>
       <DataTable data={filtered} columns={columns} noHeader pagination progressPending={loading} progressComponent={<Spinner color="primary" className="my-2" />} noDataComponent="Aucun service trouvé." />
     </CardBody>
-    <Modal isOpen={createOpen} toggle={closeCreate} centered><Form onSubmit={onCreate}><ModalHeader toggle={closeCreate}>Ajouter un service</ModalHeader><ModalBody>{(formErrors.user || createError) && <Alert color="danger">{formErrors.user || createError}</Alert>}<ServiceFields values={form} setValues={setForm} errors={formErrors} disabled={creating} prefix="create-service" /></ModalBody><ModalFooter><Button color="secondary" outline type="button" onClick={closeCreate} disabled={creating}>Annuler</Button><Button.Ripple color="primary" type="submit" disabled={creating}>{creating ? <Spinner size="sm" /> : "Enregistrer"}</Button.Ripple></ModalFooter></Form></Modal>
-    <Modal isOpen={editOpen} toggle={closeEdit} centered><Form onSubmit={onUpdate}><ModalHeader toggle={closeEdit}>Modifier un service</ModalHeader><ModalBody>{(editErrors.user || updateError) && <Alert color="danger">{editErrors.user || updateError}</Alert>}<ServiceFields values={editForm} setValues={setEditForm} errors={editErrors} disabled={updating} prefix="edit-service" /></ModalBody><ModalFooter><Button color="secondary" outline type="button" onClick={closeEdit} disabled={updating}>Annuler</Button><Button.Ripple color="primary" type="submit" disabled={updating}>{updating ? <Spinner size="sm" /> : "Modifier"}</Button.Ripple></ModalFooter></Form></Modal>
-    <Modal isOpen={deleteOpen} toggle={closeDelete} centered><ModalHeader toggle={closeDelete}>Supprimer un service</ModalHeader><ModalBody>{deleteError && <Alert color="danger">{deleteError}</Alert>}Voulez-vous vraiment supprimer le service {selected && selected.libelle} ?</ModalBody><ModalFooter><Button color="secondary" outline onClick={closeDelete} disabled={deleting}>Annuler</Button><Button.Ripple color="danger" onClick={onDelete} disabled={deleting}>{deleting ? <Spinner size="sm" /> : "Supprimer"}</Button.Ripple></ModalFooter></Modal>
+    <Modal isOpen={createOpen} toggle={closeCreate} centered className="urbain-dialog" ><Form onSubmit={onCreate}><ModalHeader toggle={closeCreate}>Ajouter un service</ModalHeader><ModalBody>{(formErrors.user || createError) && <Alert color="danger">{formErrors.user || createError}</Alert>}<ServiceFields values={form} setValues={setForm} errors={formErrors} disabled={creating} prefix="create-service" /></ModalBody><ModalFooter><Button color="secondary" outline type="button" onClick={closeCreate} disabled={creating}>Annuler</Button><Button.Ripple color="primary" type="submit" disabled={creating}>{creating ? <Spinner size="sm" /> : "Enregistrer"}</Button.Ripple></ModalFooter></Form></Modal>
+    <Modal isOpen={editOpen} toggle={closeEdit} centered className="urbain-dialog" ><Form onSubmit={onUpdate}><ModalHeader toggle={closeEdit}>Modifier un service</ModalHeader><ModalBody>{(editErrors.user || updateError) && <Alert color="danger">{editErrors.user || updateError}</Alert>}<ServiceFields values={editForm} setValues={setEditForm} errors={editErrors} disabled={updating} prefix="edit-service" /></ModalBody><ModalFooter><Button color="secondary" outline type="button" onClick={closeEdit} disabled={updating}>Annuler</Button><Button.Ripple color="primary" type="submit" disabled={updating}>{updating ? <Spinner size="sm" /> : "Modifier"}</Button.Ripple></ModalFooter></Form></Modal>
+    <Modal isOpen={deleteOpen} toggle={closeDelete} centered className="urbain-dialog" ><ModalHeader toggle={closeDelete}>Supprimer un service</ModalHeader><ModalBody>{deleteError && <Alert color="danger">{deleteError}</Alert>}Voulez-vous vraiment supprimer le service {selected && selected.libelle} ?</ModalBody><ModalFooter><Button color="secondary" outline onClick={closeDelete} disabled={deleting}>Annuler</Button><Button.Ripple color="danger" onClick={onDelete} disabled={deleting}>{deleting ? <Spinner size="sm" /> : "Supprimer"}</Button.Ripple></ModalFooter></Modal>
   </Card>
 }
 
 const Service = () => <ServiceProvider><ServiceTable /></ServiceProvider>
-export default Service
+const ServiceWorkspace = () => <WorkspacePage title="Services" description="Organisez les services utilisés par les agences et les agents." category="Référentiels" links={[{"label":"Agences","to":"/agences"},{"label":"Agents","to":"/agents-urbain"}]}><Service /></WorkspacePage>
+export default ServiceWorkspace

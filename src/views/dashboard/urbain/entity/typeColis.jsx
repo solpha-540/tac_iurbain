@@ -1,7 +1,9 @@
+import SearchInput from "../../../../components/urbain/SearchInput"
+import WorkspacePage from "../../../../components/urbain/WorkspacePage"
 import React, { useMemo, useState } from "react"
 import { Alert, Button, Card, CardBody, CardHeader, CardTitle, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Spinner } from "reactstrap"
 import { Box, Edit2, Plus, RefreshCw, Search, Trash2 } from "react-feather"
-import DataTable from "react-data-table-component"
+import DataTable from "../../../../components/urbain/BusinessTable"
 import { TypeColisProvider, useTypesColis } from "../../../../contexts/TypeColisContext"
 import { getUserId } from "../../../../utility/utlitaire"
 
@@ -59,7 +61,7 @@ const TypeColisTable = () => {
     { name: "Article", selector: "articles", sortable: true, minWidth: "200px" },
     { name: "Quantité", selector: "quantite", sortable: true },
     { name: "Prix article", selector: "prix_article", sortable: true, cell: row => amount(row.prix_article) },
-    { name: "Actions", ignoreRowClick: true, allowOverflow: true, button: true, width: "120px", cell: row => <div className="actions d-flex align-items-center"><Button.Ripple color="flat-primary" className="btn-icon p-0 mr-50" onClick={() => onEdit(row)} title="Modifier"><Edit2 size={17} /></Button.Ripple><Button.Ripple color="flat-danger" className="btn-icon p-0" onClick={() => { setSelected(row); clearDeleteError(); setDeleteOpen(true) }} title="Supprimer"><Trash2 size={17} /></Button.Ripple></div> },
+    { name: "Actions", ignoreRowClick: true, allowOverflow: true, button: true, width: "120px", cell: row => <div className="actions d-flex align-items-center"><Button.Ripple color="flat-primary" className="btn-icon p-0 mr-50" onClick={() => onEdit(row)} title="Modifier" aria-label="Modifier"  ><Edit2 size={17} /></Button.Ripple><Button.Ripple color="flat-danger" className="btn-icon p-0" onClick={() => { setSelected(row); clearDeleteError(); setDeleteOpen(true) }} title="Supprimer" aria-label="Supprimer"  ><Trash2 size={17} /></Button.Ripple></div> },
   ], [])
   const filtered = typesColis.filter(typeColis => [typeColis.id, typeColis.categorie, typeColis.nature, typeColis.articles, typeColis.quantite, typeColis.prix_article].some(value => String(value || "").toLowerCase().includes(search.toLowerCase())))
 
@@ -68,14 +70,15 @@ const TypeColisTable = () => {
     <CardBody>
       {successMessage && <Alert color="success" toggle={() => setSuccessMessage("")}>{successMessage}</Alert>}
       {error && <Alert color="danger">{error}</Alert>}
-      <div className="d-flex justify-content-end mb-1"><div className="position-relative has-icon-left col-12 col-md-4 px-0"><Input value={search} onChange={event => setSearch(event.target.value)} placeholder="Rechercher un type de colis" /><div className="form-control-position"><Search size={15} /></div></div></div>
+      <div className="d-flex justify-content-end mb-1"><div className="position-relative has-icon-left col-12 col-md-4 px-0"><SearchInput value={search} onChange={event => setSearch(event.target.value)} placeholder="Rechercher un type de colis"  aria-label="Rechercher un type de colis" /><div className="form-control-position"><Search size={15} /></div></div></div>
       <DataTable data={filtered} columns={columns} noHeader pagination progressPending={loading} progressComponent={<Spinner color="primary" className="my-2" />} noDataComponent="Aucun type de colis trouvé." />
     </CardBody>
-    <Modal isOpen={createOpen} toggle={closeCreate} centered><Form onSubmit={onCreate}><ModalHeader toggle={closeCreate}>Ajouter un type de colis</ModalHeader><ModalBody>{(formErrors.user || createError) && <Alert color="danger">{formErrors.user || createError}</Alert>}<TypeColisFields values={form} setValues={setForm} errors={formErrors} disabled={creating} prefix="create-type-colis" /></ModalBody><ModalFooter><Button color="secondary" outline type="button" onClick={closeCreate} disabled={creating}>Annuler</Button><Button.Ripple color="primary" type="submit" disabled={creating}>{creating ? <Spinner size="sm" /> : "Enregistrer"}</Button.Ripple></ModalFooter></Form></Modal>
-    <Modal isOpen={editOpen} toggle={closeEdit} centered><Form onSubmit={onUpdate}><ModalHeader toggle={closeEdit}>Modifier un type de colis</ModalHeader><ModalBody>{(editErrors.user || updateError) && <Alert color="danger">{editErrors.user || updateError}</Alert>}<TypeColisFields values={editForm} setValues={setEditForm} errors={editErrors} disabled={updating} prefix="edit-type-colis" /></ModalBody><ModalFooter><Button color="secondary" outline type="button" onClick={closeEdit} disabled={updating}>Annuler</Button><Button.Ripple color="primary" type="submit" disabled={updating}>{updating ? <Spinner size="sm" /> : "Modifier"}</Button.Ripple></ModalFooter></Form></Modal>
-    <Modal isOpen={deleteOpen} toggle={closeDelete} centered><ModalHeader toggle={closeDelete}>Supprimer un type de colis</ModalHeader><ModalBody>{deleteError && <Alert color="danger">{deleteError}</Alert>}Voulez-vous vraiment supprimer le type de colis {selected && selected.categorie} ?</ModalBody><ModalFooter><Button color="secondary" outline onClick={closeDelete} disabled={deleting}>Annuler</Button><Button.Ripple color="danger" onClick={onDelete} disabled={deleting}>{deleting ? <Spinner size="sm" /> : "Supprimer"}</Button.Ripple></ModalFooter></Modal>
+    <Modal isOpen={createOpen} toggle={closeCreate} centered className="urbain-dialog" ><Form onSubmit={onCreate}><ModalHeader toggle={closeCreate}>Ajouter un type de colis</ModalHeader><ModalBody>{(formErrors.user || createError) && <Alert color="danger">{formErrors.user || createError}</Alert>}<TypeColisFields values={form} setValues={setForm} errors={formErrors} disabled={creating} prefix="create-type-colis" /></ModalBody><ModalFooter><Button color="secondary" outline type="button" onClick={closeCreate} disabled={creating}>Annuler</Button><Button.Ripple color="primary" type="submit" disabled={creating}>{creating ? <Spinner size="sm" /> : "Enregistrer"}</Button.Ripple></ModalFooter></Form></Modal>
+    <Modal isOpen={editOpen} toggle={closeEdit} centered className="urbain-dialog" ><Form onSubmit={onUpdate}><ModalHeader toggle={closeEdit}>Modifier un type de colis</ModalHeader><ModalBody>{(editErrors.user || updateError) && <Alert color="danger">{editErrors.user || updateError}</Alert>}<TypeColisFields values={editForm} setValues={setEditForm} errors={editErrors} disabled={updating} prefix="edit-type-colis" /></ModalBody><ModalFooter><Button color="secondary" outline type="button" onClick={closeEdit} disabled={updating}>Annuler</Button><Button.Ripple color="primary" type="submit" disabled={updating}>{updating ? <Spinner size="sm" /> : "Modifier"}</Button.Ripple></ModalFooter></Form></Modal>
+    <Modal isOpen={deleteOpen} toggle={closeDelete} centered className="urbain-dialog" ><ModalHeader toggle={closeDelete}>Supprimer un type de colis</ModalHeader><ModalBody>{deleteError && <Alert color="danger">{deleteError}</Alert>}Voulez-vous vraiment supprimer le type de colis {selected && selected.categorie} ?</ModalBody><ModalFooter><Button color="secondary" outline onClick={closeDelete} disabled={deleting}>Annuler</Button><Button.Ripple color="danger" onClick={onDelete} disabled={deleting}>{deleting ? <Spinner size="sm" /> : "Supprimer"}</Button.Ripple></ModalFooter></Modal>
   </Card>
 }
 
 const TypeColis = () => <TypeColisProvider><TypeColisTable /></TypeColisProvider>
-export default TypeColis
+const TypeColisWorkspace = () => <WorkspacePage title="Types de colis" description="Définissez les catégories de colis utilisées pour le transport et la tarification." category="Référentiels" links={[{"label":"Tarifs","to":"/prixlignes"},{"label":"Réservations","to":"/reservations"}]}><TypeColis /></WorkspacePage>
+export default TypeColisWorkspace

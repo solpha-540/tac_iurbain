@@ -1,10 +1,12 @@
+import SearchInput from "../../../../components/urbain/SearchInput"
+import WorkspacePage from "../../../../components/urbain/WorkspacePage"
 import React, { useMemo, useState } from "react"
 import {
   Alert, Button, Card, CardBody, CardHeader, CardTitle, Form, FormFeedback,
   FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Spinner
 } from "reactstrap"
 import { Edit2, MapPin, Plus, RefreshCw, Search, Trash2 } from "react-feather"
-import DataTable from "react-data-table-component"
+import DataTable from "../../../../components/urbain/BusinessTable"
 import { ProvinceProvider, useProvinces } from "../../../../contexts/ProvinceContext"
 import { getUserId } from "../../../../utility/utlitaire"
 
@@ -168,14 +170,14 @@ const ProvinceTable = () => {
         {error ? <Alert color="danger">{error}</Alert> : null}
         <div className="d-flex justify-content-end mb-1">
           <div className="position-relative has-icon-left col-12 col-md-4 px-0">
-            <Input value={search} onChange={event => setSearch(event.target.value)} placeholder="Rechercher une province" />
+            <SearchInput value={search} onChange={event => setSearch(event.target.value)} placeholder="Rechercher une province"  aria-label="Rechercher une province" />
             <div className="form-control-position"><Search size={15} /></div>
           </div>
         </div>
         <DataTable data={filteredProvinces} columns={columns} noHeader pagination progressPending={loading} progressComponent={<Spinner color="primary" className="my-2" />} noDataComponent="Aucune province trouvée." />
       </CardBody>
 
-      <Modal isOpen={isCreateModalOpen} toggle={toggleCreateModal} centered>
+      <Modal isOpen={isCreateModalOpen} toggle={toggleCreateModal} centered className="urbain-dialog" >
         <Form onSubmit={handleCreateProvince}>
           <ModalHeader toggle={toggleCreateModal}>Ajouter une province</ModalHeader>
           <ModalBody>
@@ -193,7 +195,7 @@ const ProvinceTable = () => {
         </Form>
       </Modal>
 
-      <Modal isOpen={isEditModalOpen} toggle={toggleEditModal} centered>
+      <Modal isOpen={isEditModalOpen} toggle={toggleEditModal} centered className="urbain-dialog" >
         <Form onSubmit={handleUpdateProvince}>
           <ModalHeader toggle={toggleEditModal}>Modifier une province</ModalHeader>
           <ModalBody>
@@ -211,7 +213,7 @@ const ProvinceTable = () => {
         </Form>
       </Modal>
 
-      <Modal isOpen={isDeleteModalOpen} toggle={toggleDeleteModal} centered>
+      <Modal isOpen={isDeleteModalOpen} toggle={toggleDeleteModal} centered className="urbain-dialog" >
         <ModalHeader toggle={toggleDeleteModal}>Supprimer une province</ModalHeader>
         <ModalBody>
           {deleteError ? <Alert color="danger">{deleteError}</Alert> : null}
@@ -232,4 +234,5 @@ const Province = () => (
   </ProvinceProvider>
 )
 
-export default Province
+const ProvinceWorkspace = () => <WorkspacePage title="Provinces" description="Organisez les provinces utilisées dans les adresses de votre réseau." category="Territoires" links={[{"label":"Villes","to":"/villes"},{"label":"Communes","to":"/communes"}]}><Province /></WorkspacePage>
+export default ProvinceWorkspace

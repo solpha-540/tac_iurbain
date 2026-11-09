@@ -1,15 +1,17 @@
+import SearchInput from "../../../../components/urbain/SearchInput"
+import WorkspacePage from "../../../../components/urbain/WorkspacePage"
 import React, { useMemo, useState } from "react"
 import {
   Alert, Button, Card, CardBody, CardHeader, CardTitle, Form, FormFeedback,
   FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Spinner
 } from "reactstrap"
 import { Edit2, MapPin, Plus, RefreshCw, Search, Trash2 } from "react-feather"
-import DataTable from "react-data-table-component"
+import DataTable from "../../../../components/urbain/BusinessTable"
 import { ProvinceProvider, useProvinces } from "../../../../contexts/ProvinceContext"
 import { VilleProvider, useVilles } from "../../../../contexts/VilleContext"
 import { getUserId } from "../../../../utility/utlitaire"
 
-const getProvinceId = ville => ville.Id_province ?? ville.id_province ?? ville.province_id
+const getProvinceId = ville => ville.Id_province ?? ville.id_province ?? ville.province_id ?? ville.province?.id
 
 const VilleTable = () => {
   const {
@@ -133,9 +135,18 @@ const VilleTable = () => {
     }
   }
 
+  const provincesById = useMemo(() => new Map(
+    provinces
+      .filter(province => province.id !== undefined && province.id !== null)
+      .map(province => [String(province.id), province])
+  ), [provinces])
+
   const getProvinceLabel = ville => {
-    const province = provinces.find(item => String(item.id) === String(getProvinceId(ville)))
-    return province ? province.labele : "-"
+    const provinceId = getProvinceId(ville)
+    if (provinceId === undefined || provinceId === null || provinceId === "") return "Non renseignée"
+    const province = provincesById.get(String(provinceId))
+    if (province) return province.labele || province.libelle || province.nom || ("Province #" + provinceId)
+    return provincesLoading ? "Chargement..." : "Province #" + provinceId
   }
 
   const columns = useMemo(() => [
@@ -169,7 +180,7 @@ const VilleTable = () => {
         </div>
       )
     }
-  ], [provinces])
+  ], [provincesById, provincesLoading])
 
   const filteredVilles = villes.filter(ville => {
     const searchValue = search.toLowerCase()
@@ -196,13 +207,13 @@ const VilleTable = () => {
         {successMessage ? <Alert color="success" toggle={() => setSuccessMessage("")}>{successMessage}</Alert> : null}
         {error ? <Alert color="danger">{error}</Alert> : null}
         <div className="d-flex justify-content-end mb-1"><div className="position-relative has-icon-left col-12 col-md-4 px-0">
-          <Input value={search} onChange={event => setSearch(event.target.value)} placeholder="Rechercher une ville" />
+          <SearchInput value={search} onChange={event => setSearch(event.target.value)} placeholder="Rechercher une ville"  aria-label="Rechercher une ville" />
           <div className="form-control-position"><Search size={15} /></div>
         </div></div>
         <DataTable data={filteredVilles} columns={columns} noHeader pagination progressPending={loading} progressComponent={<Spinner color="primary" className="my-2" />} noDataComponent="Aucune ville trouvée." />
       </CardBody>
 
-      <Modal isOpen={isCreateModalOpen} toggle={toggleCreateModal} centered>
+      <Modal isOpen={isCreateModalOpen} toggle={toggleCreateModal} centered className="urbain-dialog" >
         <Form onSubmit={handleCreateVille}>
           <ModalHeader toggle={toggleCreateModal}>Ajouter une ville</ModalHeader>
           <ModalBody>
@@ -214,7 +225,7 @@ const VilleTable = () => {
         </Form>
       </Modal>
 
-      <Modal isOpen={isEditModalOpen} toggle={toggleEditModal} centered>
+      <Modal isOpen={isEditModalOpen} toggle={toggleEditModal} centered className="urbain-dialog" >
         <Form onSubmit={handleUpdateVille}>
           <ModalHeader toggle={toggleEditModal}>Modifier une ville</ModalHeader>
           <ModalBody>
@@ -226,7 +237,7 @@ const VilleTable = () => {
         </Form>
       </Modal>
 
-      <Modal isOpen={isDeleteModalOpen} toggle={toggleDeleteModal} centered>
+      <Modal isOpen={isDeleteModalOpen} toggle={toggleDeleteModal} centered className="urbain-dialog" >
         <ModalHeader toggle={toggleDeleteModal}>Supprimer une ville</ModalHeader>
         <ModalBody>{deleteError ? <Alert color="danger">{deleteError}</Alert> : null}Voulez-vous vraiment supprimer cette ville ?</ModalBody>
         <ModalFooter><Button color="secondary" outline onClick={toggleDeleteModal} disabled={deleting}>Annuler</Button><Button.Ripple color="danger" onClick={handleDeleteVille} disabled={deleting}>{deleting ? <Spinner size="sm" className="mr-50" /> : <Trash2 size={15} className="mr-50" />}Supprimer</Button.Ripple></ModalFooter>
@@ -237,4 +248,5 @@ const VilleTable = () => {
 
 const Ville = () => <ProvinceProvider><VilleProvider><VilleTable /></VilleProvider></ProvinceProvider>
 
-export default Ville
+const VilleWorkspace = () => <WorkspacePage title="Villes" description="Gérez les villes et leur rattachement aux provinces." category="Territoires" links={[{"label":"Provinces","to":"/provinces"},{"label":"Communes","to":"/communes"}]}><Ville /></WorkspacePage>
+export default VilleWorkspace
