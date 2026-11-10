@@ -49,6 +49,7 @@ const Agent = lazy(() =>
   import("./views/dashboard/urbain/entity/agent")
 )
 
+const Roles = lazy(() => import("./views/dashboard/urbain/entity/role"))
 const AgentUrbain = lazy(() => import("./views/dashboard/urbain/entity/agent_urbain"))
 
 const ecommerceDashboard = lazy(() =>
@@ -272,6 +273,7 @@ class AppRouter extends React.Component {
           <AppRoute exact path="/reservations" component={Booking} />
           <AppRoute exact path="/agents" component={Agent} />
           <AppRoute exact path="/agents-urbain" component={AgentUrbain} />
+          <AppRoute exact path="/administration/roles" component={Roles} />
 
 
 

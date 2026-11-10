@@ -165,7 +165,7 @@ const navigationConfigCustom = [
       },
       {
         id: "administration-roles",
-        title: "Rôles et permissions",
+        title: "Rôles",
         type: "item",
         icon: <Icon.Circle size={12} />,
         permissions,

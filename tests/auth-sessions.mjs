@@ -391,6 +391,48 @@ try {
   await assert.rejects(assignAgentUrbain(15, { id_agence: "2", DateAffectation: "2999-01-01T12:00" }), /futur/)
   console.log("PASS: erreur API au singulier et blocage des affectations futures")
 
+
+  reset(); seed()
+  tokens.setKisaluTokens({ access: "kisalu-not-for-roles" })
+  const { getRoles, createRole } = await server.ssrLoadModule("/src/components/Api/RoleService.js")
+  const roleFixture = { id: 42, label: "CAISSIER" }
+  for (const data of [[roleFixture], {roles:[roleFixture]}]) {
+    handler = async config => {
+      assert.equal(config.method, "get")
+      assert.equal(config.url, "/resource/roles")
+      assert.equal(config.baseURL, "https://urbain.test/api/v1")
+      assert.equal(config.headers.get("Authorizations"), "tac urbain-old")
+      return response(config, {code:200,data})
+    }
+    assert.deepEqual(await getRoles(), [roleFixture])
+  }
+  let rolePosts = 0
+  handler = async config => {
+    rolePosts++
+    assert.equal(config.method, "post")
+    assert.equal(config.url, "/resource/roles")
+    assert.equal(config.headers.get("Authorizations"), "tac urbain-old")
+    assert.deepEqual(JSON.parse(config.data), {label:"CAISSIER"})
+    return response(config, {code:201,data:{role:roleFixture}})
+  }
+  assert.equal((await createRole(" CAISSIER ")).role.id, 42)
+  await assert.rejects(createRole("  "), /obligatoire/)
+  assert.equal(rolePosts, 1)
+  handler = async config => response(config, {code:200,data:[]})
+  assert.deepEqual(await getRoles(), [])
+  handler = async config => response(config, {code:422,message:"Role deja existant",error:{label:["Doublon"]}})
+  await assert.rejects(createRole("CAISSIER"), e => e.response.data.error.label[0] === "Doublon")
+  await assert.rejects(getRoles(), /deja existant/)
+  handler = async config => {
+    assert.equal(config.url, "/resource/agent-accounts")
+    assert.equal(JSON.parse(config.data).role_id, roleFixture.id)
+    assert.equal(config.headers.get("Authorizations"), "tac urbain-old")
+    return response(config, {code:201,data:{account:{id:100}}})
+  }
+  await createAgentAccount(15, {login:"test-role",pwd:"test-only",pwd_confirmation:"test-only",status:"AG",role_id:String(roleFixture.id)})
+  assert.equal(tokens.getKisaluToken(), "kisalu-not-for-roles")
+  console.log("PASS: GET/POST roles, erreurs, token Inter-urbain et role selectionne pour le compte")
+
 } finally {
   axios.defaults.adapter = originalAdapter
   await server.close()

@@ -1,5 +1,5 @@
 const labels = {
-  nom: "Nom", postnom: "Postnom", prenom: "Prénom", Telephone: "Téléphone",
+  label: "Libellé", nom: "Nom", postnom: "Postnom", prenom: "Prénom", Telephone: "Téléphone",
   sexe: "Sexe", lieuNaissance: "Lieu de naissance", DateNaissance: "Date de naissance",
   date_embauche: "Date d'embauche", email: "E-mail", Fonction: "Fonction", Grade: "Grade",
   id_commune: "Commune", Id_direction: "Direction", Id_service: "Service",

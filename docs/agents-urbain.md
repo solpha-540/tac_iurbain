@@ -53,9 +53,7 @@ La création de compte envoie `agent_id`, `login`, `pwd`,
 `pwd_confirmation`, `status` et `role_id` vers `/resource/agent-accounts`.
 Le login est prérempli par le téléphone, en conservant les zéros initiaux.
 Le statut est initialisé à AG et reste modifiable.
-À la demande de l'utilisateur, un rôle provisoire porte l'ID 6 de l'exemple
-et le libellé « Rôle générique ». Ce libellé ne décrit pas les permissions du
-backend ; la liste sera remplacée lorsque l'API des rôles sera disponible.
+Les rôles sont chargés depuis GET /resource/roles et le rôle sélectionné est transmis dans role_id.
 
 Les mots de passe ne sont ni journalisés ni enregistrés dans le stockage.
 Les doubles soumissions sont bloquées pendant l'envoi. Après succès, la liste
@@ -64,3 +62,27 @@ Les deux appels utilisent exclusivement urbainApi et affichent les erreurs API.
 
 Fichiers : Agent_urbainService.js, Agent_urbainContext.js, agent_urbain.jsx,
 AgentActionModal.jsx et tests/auth-sessions.mjs.
+
+## Catalogue des rôles
+
+L'écran Administration → Rôles est disponible à /administration/roles.
+Il utilise RoleService.js et RoleContext.js pour :
+- GET /resource/roles : liste, recherche locale, actualisation et erreurs.
+- POST /resource/roles avec le corps JSON { "label": "CAISSIER" } : création.
+
+Faute d'exemple JSON du GET fourni, le service prend en charge les collections
+dans data ou dans data.roles. Une réponse réelle d'un autre format nécessitera
+d'adapter uniquement getRoles.
+
+Le formulaire de création de compte recharge ce catalogue à chaque ouverture.
+Il affiche les libellés et transmet l'identifiant du rôle sélectionné dans role_id.
+Aucun rôle fictif ne subsiste. Le formulaire bloque la soumission pendant
+le chargement, après une erreur de chargement ou si le catalogue est vide.
+Un bouton permet de réessayer après une erreur. Les doublons et autres validations
+de l'API sont affichés ; les soumissions multiples sont bloquées pendant l'envoi.
+
+Nouveaux fichiers : src/components/Api/RoleService.js, src/contexts/RoleContext.js,
+src/views/dashboard/urbain/entity/role.jsx.
+Modifications : AgentActionModal.jsx, Router.js, navigationConfigCustom.js,
+tests/auth-sessions.mjs et cette documentation.
+Aucune API de modification, suppression ou gestion des permissions n'est supposée.
