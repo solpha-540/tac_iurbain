@@ -121,6 +121,13 @@ const navigationConfigCustom = [
         icon: <Icon.Menu size={12} />,
         permissions,
         navLink: "/prixlignes"
+      },{
+        id: "PrixCargo-list",
+        title: "Tarifs cargo",
+        type: "item",
+        icon: <Icon.Menu size={12} />,
+        permissions,
+        navLink: "/prixcargo"
       },
          {
         id: "TypeColis-list",

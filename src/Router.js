@@ -36,6 +36,9 @@ const Ligne = lazy(() =>
 const PrixLigne = lazy(() =>
   import("./views/dashboard/urbain/entity/prix_ligne")
 )
+const PrixCargo = lazy(() =>
+  import("./views/dashboard/urbain/entity/prix_Cargo")
+)
 const Service = lazy(() =>
   import("./views/dashboard/urbain/entity/service")
 )
@@ -268,6 +271,7 @@ class AppRouter extends React.Component {
           <AppRoute exact path="/currencies" component={Currency} />
           <AppRoute exact path="/lignes" component={Ligne} />
           <AppRoute exact path="/prixlignes" component={PrixLigne} />
+          <AppRoute exact path="/prixcargo" component={PrixCargo} />
           <AppRoute exact path="/services" component={Service} />
           <AppRoute exact path="/colis" component={TypeColis} />
           <AppRoute exact path="/reservations" component={Booking} />
