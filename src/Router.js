@@ -6,12 +6,16 @@ import { Redirect } from "react-router-dom"
 import Spinner from "./components/@vuexy/spinner/Loading-spinner"
 import knowledgeBaseCategory from "./views/pages/knowledge-base/Category"
 import knowledgeBaseQuestion from "./views/pages/knowledge-base/Questions"
+import { AGENCY_MANAGER } from "./services/auth/roles"
+import { getUrbainToken } from "./services/auth/tokenStorage"
 import { ContextLayout } from "./utility/context/Layout"
 
 // Route-based code splitting
 const analyticsDashboard = lazy(() =>
   import("./views/dashboard/analytics/AnalyticsDashboard")
 )
+const Soutes = lazy(() => import("./views/dashboard/urbain/entity/soutes"))
+const AgencyHome = lazy(() => import("./views/dashboard/urbain/AgencyHome"))
 const Province = lazy(() =>
   import("./views/dashboard/urbain/entity/province")
 )
@@ -221,21 +225,27 @@ const accessControl = lazy(() =>
   import("./extensions/access-control/AccessControl")
 )
 // Set Layout and Component Using App Route
-const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
+const RouteConfig = ({ component: Component, fullLayout, user, agencyOnly, ...rest }) => (
   <Route
     {...rest}
     render={props => {
+      if (!fullLayout) {
+        if (!getUrbainToken()) return <Redirect to="/pages/login" />
+        if (agencyOnly && user !== AGENCY_MANAGER) return <Redirect to="/misc/not-authorized" />
+        if (user === AGENCY_MANAGER && !agencyOnly) return <Redirect to="/accueil-agence" />
+        if (!["admin", "editor", AGENCY_MANAGER].includes(user)) return <Redirect to="/misc/not-authorized" />
+      }
       return (
         <ContextLayout.Consumer>
           {context => {
             let LayoutTag =
               fullLayout === true
                 ? context.fullLayout
-                : context.state.activeLayout === "horizontal"
+                : user !== AGENCY_MANAGER && context.state.activeLayout === "horizontal"
                 ? context.horizontalLayout
                 : context.VerticalLayout
             return (
-              <LayoutTag {...props} permission={props.user}>
+              <LayoutTag {...props} permission={user}>
                 <Suspense fallback={<Spinner />}>
                   <Component {...props} />
                 </Suspense>
@@ -271,7 +281,9 @@ class AppRouter extends React.Component {
           <AppRoute exact path="/currencies" component={Currency} />
           <AppRoute exact path="/lignes" component={Ligne} />
           <AppRoute exact path="/prixlignes" component={PrixLigne} />
-          <AppRoute exact path="/prixcargo" component={PrixCargo} />
+          <AppRoute exact path="/accueil-agence" component={AgencyHome} agencyOnly />
+          <AppRoute exact path="/prixcargo" component={PrixCargo} agencyOnly />
+          <AppRoute exact path="/soutes" component={Soutes} agencyOnly />
           <AppRoute exact path="/services" component={Service} />
           <AppRoute exact path="/colis" component={TypeColis} />
           <AppRoute exact path="/reservations" component={Booking} />

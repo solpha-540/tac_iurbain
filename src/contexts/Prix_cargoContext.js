@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react"
-import { getAgences } from "../components/Api/AgenceService"
+import { useSelector } from "react-redux"
 import { getPrixCargos, createPrixCargo } from "../components/Api/Prix_cargoService"
 import { getLignesPrincipales, getLignesSecondaires } from "../components/Api/Prix_ligneService"
 
@@ -12,7 +12,7 @@ const errorMessage = (error, fallback) =>
 
 export const PrixCargoProvider = ({ children }) => {
   const [prixCargos, setPrixCargos] = useState([])
-  const [agences, setAgences] = useState([])
+  const agency = useSelector(state => state.auth.login.values?.agency)
   const [lignesPrincipales, setLignesPrincipales] = useState([])
   const [lignesSecondaires, setLignesSecondaires] = useState([])
   const [loading, setLoading] = useState(true)
@@ -24,14 +24,12 @@ export const PrixCargoProvider = ({ children }) => {
     setError("")
 
     try {
-      const [prices, agencies, mainLines, secondaryLines] = await Promise.all([
+      const [prices, mainLines, secondaryLines] = await Promise.all([
         getPrixCargos(),
-        getAgences(),
         getLignesPrincipales(),
         getLignesSecondaires(),
       ])
       setPrixCargos(prices)
-      setAgences(agencies)
       setLignesPrincipales(mainLines)
       setLignesSecondaires(secondaryLines)
     } catch (requestError) {
@@ -62,7 +60,7 @@ export const PrixCargoProvider = ({ children }) => {
 
   const value = {
     prixCargos,
-    agences,
+    agency,
     lignesPrincipales,
     lignesSecondaires,
     loading,

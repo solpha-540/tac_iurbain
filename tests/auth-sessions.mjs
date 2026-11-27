@@ -89,6 +89,70 @@ try {
   assert.equal(tokens.getUrbainToken(), "urbain-old")
   console.log("PASS: connexion utilisateur, isolation des tokens et login Kisalu partagé")
 
+  const { login: loginReducer } = await server.ssrLoadModule("/src/redux/reducers/auth/loginReducer.js")
+  const { AGENCY_MANAGER } = await server.ssrLoadModule("/src/services/auth/roles.js")
+  const { getPrixCargos, createPrixCargo } = await server.ssrLoadModule("/src/components/Api/Prix_cargoService.js")
+  assert.equal(loginReducer(undefined, { type: "INIT" }).userRole, "admin")
+  await assert.rejects(getPrixCargos, /chef d.agence/)
+  await assert.rejects(() => createPrixCargo({}), /chef d.agence/)
+
+  const tariff = { id: 8, id_agence: 1, id_ligne_principal: 11, id_ligne_secondaire: 15, prix_location: "600000.00" }
+  handler = async config => {
+    if (config.url === "/auth/login") {
+      return response(config, { code: 200, data: {
+        access_token: "agency-token",
+        user: { id: 28, status: "AG", role: { id: 13, label: "CHEF D'AGENCE" } },
+        agency: { id: 1, nom: "Agence test" }
+      } })
+    }
+    assert.equal(config.url, "/resource/prix-locations")
+    assert.equal(config.headers.get("Authorizations"), "tac agency-token")
+    if (config.method === "get") {
+      return response(config, { code: 200, data: { prix_locations: [tariff, { id: 9, agence: { id: 2 } }] } })
+    }
+    assert.equal(config.method, "post")
+    const { id, ...expectedPayload } = tariff
+    assert.deepEqual(JSON.parse(config.data), expectedPayload)
+    return response(config, { code: 201, data: { prix_location: tariff } })
+  }
+  const agencySession = await login("agency-test", "test-only-password")
+  const restored = loginReducer(undefined, { type: "INIT" })
+  assert.equal(restored.userRole, AGENCY_MANAGER)
+  assert.deepEqual(restored.values.agency, agencySession.agency)
+  assert.deepEqual(await getPrixCargos(), [tariff])
+  const { id, ...tariffPayload } = tariff
+  assert.deepEqual(await createPrixCargo({ ...tariffPayload, id_agence: 2 }), tariff)
+  console.log("PASS: restauration du rôle et tarifs limités à l’agence de la session")
+
+  const { getBuses } = await server.ssrLoadModule("/src/components/Api/busService.js")
+  const { getSoutes, createSoute } = await server.ssrLoadModule("/src/components/Api/soutesService.js")
+  const { default: kisalu } = await server.ssrLoadModule("/src/services/api/kisaluApi.js")
+  const bus = { id: 27, num_bus: "12BB11", marque: "NISSAN", service: { libelle: "SERVICE INTERURBAIN" } }
+  const souteFields = { id_bus: 27, code: "ARR-D12", libelle: "Soute arrière droite" }
+  const soute = { id: 3, status: "ACTIVE", ...souteFields }
+  tokens.setKisaluTokens({ access: "kisalu-bus", expires_in: 3600 })
+  handler = async config => {
+    if (config.url === "/bus/get") {
+      assert.equal(config.method, "get")
+      assert.equal(config.headers.get("Authorizations"), "tac kisalu-bus")
+      return response(config, { code: 200, data: [bus] })
+    }
+    assert.equal(config.url, "/resource/soutes")
+    assert.equal(config.headers.get("Authorizations"), "tac agency-token")
+    if (config.method === "get") {
+      assert.deepEqual(config.params, { id_bus: bus.id })
+      return response(config, { code: 200, data: [soute] })
+    }
+    assert.equal(config.method, "post")
+    assert.deepEqual(JSON.parse(config.data), souteFields)
+    return response(config, { code: 201, data: soute })
+  }
+  assert.deepEqual(await getBuses(), [bus])
+  assert.deepEqual(await getSoutes(bus.id), [soute])
+  assert.deepEqual(await createSoute(soute), soute)
+  await assert.rejects(() => kisalu.post("/bus/get"), /réservé/)
+  console.log("PASS: bus Kisalu et lecture et création des soutes Inter-urbain")
+
   reset(); seed()
   tokens.setKisaluTokens({ access: "kisalu-old" })
   logins = 0

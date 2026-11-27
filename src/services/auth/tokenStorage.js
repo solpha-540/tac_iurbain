@@ -25,6 +25,16 @@ export const setUrbainTokens = data => {
 export const setUrbainProfile = data => {
   for (const key of ["user", "agent", "agency"]) write("urbain_" + key, JSON.stringify(data[key] ?? null))
 }
+export const getUrbainProfile = () => {
+  const readProfile = key => {
+    try {
+      return JSON.parse(read("urbain_" + key))
+    } catch (_) {
+      return null
+    }
+  }
+  return { user: readProfile("user"), agent: readProfile("agent"), agency: readProfile("agency") }
+}
 export const isUrbainRefreshExpired = () => {
   const expires = Number(read("urbain_refresh_expires_at"))
   return expires > 0 && expires <= Date.now()

@@ -2,10 +2,13 @@ import { createApi, kisaluBaseURL, requireBaseURL } from "./createApi"
 import { ensureKisaluToken } from "../auth/kisaluAuth"
 import { getKisaluToken, getKisaluVersion, clearKisaluTokens, authorization } from "../auth/tokenStorage"
 
+const listEndpoints = new Set(["/agent/ListeAgent", "/bus/get"])
 const kisaluApi = createApi(kisaluBaseURL)
 kisaluApi.interceptors.request.use(async config => {
   requireBaseURL(kisaluBaseURL)
-  if (config.url !== "/agent/ListeAgent") throw new Error("Cet accès Kisalu est réservé à la liste des agents.")
+  if (config.method !== "get" || !listEndpoints.has(config.url)) {
+    throw new Error("Cet accès Kisalu est réservé aux listes des agents et des bus.")
+  }
   if (config._sessionVersion !== undefined && config._sessionVersion !== getKisaluVersion()) throw new Error("Session Kisalu terminée.")
   const version = getKisaluVersion()
   const token = await ensureKisaluToken()

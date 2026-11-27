@@ -1,7 +1,8 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import classnames from "classnames"
-import navigationConfig from "../../../../../configs/navigationConfigCustom"
+import navigationConfig, { agencyNavigation } from "../../../../../configs/navigationConfigCustom"
+import { AGENCY_MANAGER } from "../../../../../services/auth/roles"
 import SideMenuGroup from "./SideMenuGroup"
 import { Badge } from "reactstrap"
 import { ChevronRight } from "react-feather"
@@ -123,7 +124,8 @@ class SideMenuContent extends React.Component {
   render() {
     // Loop over sidebar items
     // eslint-disable-next-line
-    const menuItems = navigationConfig.map(item => {
+    const navigation = this.props.currentUser === AGENCY_MANAGER ? agencyNavigation : navigationConfig
+    const menuItems = navigation.map(item => {
       const CustomAnchorTag = item.type === "external-link" ? `a` : Link
       // checks if item has groupheader
       if (item.type === "groupHeader") {

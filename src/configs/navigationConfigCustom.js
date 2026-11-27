@@ -1,6 +1,35 @@
 import React from "react"
 import * as Icon from "react-feather"
 
+import { AGENCY_MANAGER } from "../services/auth/roles"
+
+export const agencyNavigation = [
+  {
+    id: "agency-home",
+    title: "Accueil",
+    type: "item",
+    icon: <Icon.Home size={20} />,
+    permissions: [AGENCY_MANAGER],
+    navLink: "/accueil-agence"
+  },
+  {
+    id: "PrixCargo-list",
+    title: "Tarifs cargo",
+    type: "item",
+    icon: <Icon.Menu size={20} />,
+    permissions: [AGENCY_MANAGER],
+    navLink: "/prixcargo"
+  },
+  {
+    id: "soutes",
+    title: "Soutes",
+    type: "item",
+    icon: <Icon.Truck size={20} />,
+    permissions: [AGENCY_MANAGER],
+    navLink: "/soutes"
+  }
+]
+
 const permissions = ["admin", "editor"]
 
 const navigationConfigCustom = [
@@ -121,13 +150,6 @@ const navigationConfigCustom = [
         icon: <Icon.Menu size={12} />,
         permissions,
         navLink: "/prixlignes"
-      },{
-        id: "PrixCargo-list",
-        title: "Tarifs cargo",
-        type: "item",
-        icon: <Icon.Menu size={12} />,
-        permissions,
-        navLink: "/prixcargo"
       },
          {
         id: "TypeColis-list",

@@ -1,4 +1,5 @@
 import { history } from "../../../history"
+import { AGENCY_MANAGER, getUrbainRole } from "../../../services/auth/roles"
 import { login } from "../../../services/auth/urbainAuth"
 import { endSession, onSessionEnded } from "../../../services/auth/session"
 import { setNom, setPrenom, setRole, setUserId } from "../../../utility/utlitaire"
@@ -21,12 +22,12 @@ export const loginUrbain = ({ login: loginValue, pwd }) => async dispatch => {
     setUserId(user.id || agent.agent_id || agent.id)
     setNom(user.nom || agent.nom)
     setPrenom(user.prenom || agent.prenom)
-    setRole(user.role_libelle || agent.role_libelle)
+    setRole(user.role?.label || user.role_libelle || agent.role_libelle)
     dispatch({
       type: "LOGIN_WITH_JWT",
       payload: { loggedInUser: user, agent: data.agent, agency: data.agency, loggedInWith: "urbain" }
     })
-    history.push("/dashboard")
+    history.push(getUrbainRole(user, agent) === AGENCY_MANAGER ? "/accueil-agence" : "/dashboard")
     return data
   } catch (error) {
     const message = getApiErrorMessage(error)

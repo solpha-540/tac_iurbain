@@ -8,3 +8,4 @@ export const getAgents = async () => {
   }
   return Array.isArray(responseData.data) ? responseData.data : []
 }
+

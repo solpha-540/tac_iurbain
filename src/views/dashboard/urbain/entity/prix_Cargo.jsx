@@ -7,14 +7,10 @@ import SearchInput from "../../../../components/urbain/SearchInput"
 import WorkspacePage from "../../../../components/urbain/WorkspacePage"
 import { PrixCargoProvider, usePrixCargos } from "../../../../contexts/Prix_cargoContext"
 
-const emptyForm = { id_agence: "", id_ligne_principal: "", id_ligne_secondaire: "", prix_location: "" }
+const emptyForm = { id_ligne_principal: "", id_ligne_secondaire: "", prix_location: "" }
 
 const valueFor = (row, keys) => keys.map(key => row && row[key]).find(value => value !== undefined && value !== null && value !== "")
-const agencyName = (row, agencies) =>
-  row.nom_agence ||
-  row.agence_nom ||
-  (agencies.find(agency => String(agency.id) === String(valueFor(row, ["id_agence", "agence_id"]))) || {}).nom ||
-  "-"
+const agencyName = (row, agency) => row.agence?.nom || row.nom_agence || row.agence_nom || agency?.nom || "-"
 const lineName = (row, keys, lines) => {
   const direct = valueFor(row, keys)
   if (direct && typeof direct === "object") {
@@ -38,18 +34,27 @@ const PrixCargoTable = () => {
 
   const rows = useMemo(() => ctx.prixCargos.map(row => ({
     ...row,
-    _agency: agencyName(row, ctx.agences),
-    _mainLine: lineName(row, ["id_ligne_principal", "ligne_principale", "Destination_principale"], ctx.lignesPrincipales),
-    _secondaryLine: lineName(row, ["id_ligne_secondaire", "ligne_secondaire", "Destination_secondaire"], ctx.lignesSecondaires),
+    _agency: agencyName(row, ctx.agency),
+    _mainLine: lineName(row, ["ligne_principale", "id_ligne_principal", "Destination_principale"], ctx.lignesPrincipales),
+    _secondaryLine: lineName(row, ["ligne_secondaire", "id_ligne_secondaire", "Destination_secondaire"], ctx.lignesSecondaires),
     _price: valueFor(row, ["prix_location", "Prix_location"]),
-  })), [ctx.prixCargos, ctx.agences, ctx.lignesPrincipales, ctx.lignesSecondaires])
+  })), [ctx.prixCargos, ctx.agency, ctx.lignesPrincipales, ctx.lignesSecondaires])
 
   const filteredRows = rows.filter(row =>
     [row._agency, row._mainLine, row._secondaryLine, row._price]
       .some(value => String(value || "").toLowerCase().includes(search.toLowerCase())),
   )
 
+  const secondaryLines = ctx.lignesSecondaires.filter(line =>
+    String(line.id_ligne_principal) === form.id_ligne_principal
+  )
+
   const closeModal = () => {
+    if (ctx.saving) return
+    resetModal()
+  }
+
+  const resetModal = () => {
     setModalOpen(false)
     setForm(emptyForm)
     setErrors({})
@@ -59,7 +64,10 @@ const PrixCargoTable = () => {
   const save = async event => {
     event.preventDefault()
     const nextErrors = {}
-    if (!form.id_agence) nextErrors.id_agence = "L'agence est obligatoire."
+    if (ctx.saving || ctx.loading) return
+    if (form.id_ligne_secondaire && !secondaryLines.some(line => String(line.id) === form.id_ligne_secondaire)) {
+      nextErrors.id_ligne_secondaire = "Sélectionnez une ligne secondaire rattachée à la ligne principale."
+    }
     if (!form.id_ligne_principal) nextErrors.id_ligne_principal = "La ligne principale est obligatoire."
     if (form.prix_location === "" || !Number.isFinite(Number(form.prix_location)) || Number(form.prix_location) < 0) {
       nextErrors.prix_location = "Saisissez un montant numérique positif ou nul."
@@ -69,13 +77,12 @@ const PrixCargoTable = () => {
 
     try {
       await ctx.addPrixCargo({
-        id_agence: Number(form.id_agence),
         id_ligne_principal: Number(form.id_ligne_principal),
         ...(form.id_ligne_secondaire ? { id_ligne_secondaire: Number(form.id_ligne_secondaire) } : {}),
         prix_location: Number(form.prix_location).toFixed(2),
       })
       setSuccess("Prix cargo créé avec succès.")
-      closeModal()
+      resetModal()
     } catch (_) {}
   }
 
@@ -91,7 +98,7 @@ const PrixCargoTable = () => {
       <CardHeader className="d-flex flex-wrap justify-content-between align-items-center">
         <CardTitle tag="h4">Prix cargo</CardTitle>
         <div className="mt-1 mt-sm-0">
-          <Button.Ripple color="primary" size="sm" className="mr-50" onClick={() => { ctx.clearError(); setModalOpen(true) }}>
+          <Button.Ripple color="primary" size="sm" className="mr-50" disabled={ctx.loading || !ctx.agency?.id} onClick={() => { ctx.clearError(); setModalOpen(true) }}>
             <Plus size={15} className="mr-50" />Ajouter
           </Button.Ripple>
           <Button.Ripple color="primary" outline size="sm" onClick={ctx.fetchData} disabled={ctx.loading}>
@@ -114,31 +121,28 @@ const PrixCargoTable = () => {
           <ModalBody>
             {ctx.error && <Alert color="danger">{ctx.error}</Alert>}
             <FormGroup>
-              <Label>Agence <span className="text-danger">*</span></Label>
-              <Input type="select" value={form.id_agence} onChange={event => setForm({ ...form, id_agence: event.target.value })} invalid={Boolean(errors.id_agence)} disabled={ctx.saving || ctx.loading}>
-                <option value="">Sélectionner une agence</option>
-                {ctx.agences.map(agency => <option key={agency.id} value={agency.id}>{agency.nom || agency.libelle || agency.name}</option>)}
-              </Input>
-              {errors.id_agence && <FormFeedback>{errors.id_agence}</FormFeedback>}
+              <Label for="cargo-agency">Agence</Label>
+              <Input id="cargo-agency" value={ctx.agency?.nom || ""} readOnly />
             </FormGroup>
             <FormGroup>
-              <Label>Ligne principale <span className="text-danger">*</span></Label>
-              <Input type="select" value={form.id_ligne_principal} onChange={event => setForm({ ...form, id_ligne_principal: event.target.value })} invalid={Boolean(errors.id_ligne_principal)} disabled={ctx.saving || ctx.loading}>
+              <Label for="cargo-main-line">Ligne principale <span className="text-danger">*</span></Label>
+              <Input id="cargo-main-line" type="select" value={form.id_ligne_principal} onChange={event => setForm({ ...form, id_ligne_principal: event.target.value, id_ligne_secondaire: "" })} invalid={Boolean(errors.id_ligne_principal)} disabled={ctx.saving || ctx.loading}>
                 <option value="">Sélectionner une ligne principale</option>
                 {ctx.lignesPrincipales.map(line => <option key={line.id} value={line.id}>{line.libele_ligne || line.libelle_ligne || line.parcours_ligne || line.nom}</option>)}
               </Input>
               {errors.id_ligne_principal && <FormFeedback>{errors.id_ligne_principal}</FormFeedback>}
             </FormGroup>
             <FormGroup>
-              <Label>Ligne secondaire</Label>
-              <Input type="select" value={form.id_ligne_secondaire} onChange={event => setForm({ ...form, id_ligne_secondaire: event.target.value })} disabled={ctx.saving || ctx.loading}>
+              <Label for="cargo-secondary-line">Ligne secondaire</Label>
+              <Input id="cargo-secondary-line" type="select" value={form.id_ligne_secondaire} onChange={event => setForm({ ...form, id_ligne_secondaire: event.target.value })} invalid={Boolean(errors.id_ligne_secondaire)} disabled={ctx.saving || ctx.loading || !form.id_ligne_principal}>
                 <option value="">Sélectionner une ligne secondaire</option>
-                {ctx.lignesSecondaires.map(line => <option key={line.id} value={line.id}>{line.libele_ligne || line.libelle_ligne || line.parcours_ligne || line.nom}</option>)}
+                {secondaryLines.map(line => <option key={line.id} value={line.id}>{line.libele_ligne || line.libelle_ligne || line.parcours_ligne || line.nom}</option>)}
               </Input>
+              {errors.id_ligne_secondaire && <FormFeedback>{errors.id_ligne_secondaire}</FormFeedback>}
             </FormGroup>
             <FormGroup>
-              <Label>Prix de location <span className="text-danger">*</span></Label>
-              <Input type="number" min="0" step="0.01" value={form.prix_location} onChange={event => setForm({ ...form, prix_location: event.target.value })} invalid={Boolean(errors.prix_location)} disabled={ctx.saving} />
+              <Label for="cargo-price">Prix de location <span className="text-danger">*</span></Label>
+              <Input id="cargo-price" type="number" min="0" step="0.01" value={form.prix_location} onChange={event => setForm({ ...form, prix_location: event.target.value })} invalid={Boolean(errors.prix_location)} disabled={ctx.saving} />
               {errors.prix_location && <FormFeedback>{errors.prix_location}</FormFeedback>}
             </FormGroup>
           </ModalBody>
@@ -157,7 +161,7 @@ const PrixCargoTable = () => {
 const PrixCargo = () => <PrixCargoProvider><PrixCargoTable /></PrixCargoProvider>
 
 const PrixCargoWorkspace = () => (
-  <WorkspacePage title="Prix cargo" description="Consultez et gérez les prix de location cargo par agence et par ligne." category="Transport" links={[{ label: "Lignes", to: "/lignes" }, { label: "Prix des lignes", to: "/prixlignes" }]}>
+  <WorkspacePage title="Prix cargo" description="Consultez et gérez les prix de location cargo de votre agence." category="Transport" links={[{ label: "Accueil", to: "/accueil-agence" }]}>
     <PrixCargo />
   </WorkspacePage>
 )

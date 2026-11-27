@@ -1,4 +1,16 @@
-export const login = (state = { userRole: "admin" }, action) => {
+import { getUrbainProfile, getUrbainToken } from "../../../services/auth/tokenStorage"
+import { getUrbainRole } from "../../../services/auth/roles"
+
+const initialState = () => {
+  if (!getUrbainToken()) return { userRole: null }
+  const { user, agent, agency } = getUrbainProfile()
+  return {
+    userRole: getUrbainRole(user, agent),
+    values: { loggedInUser: user, agent, agency, loggedInWith: "urbain" }
+  }
+}
+
+export const login = (state = initialState(), action) => {
   switch (action.type) {
     case "LOGIN_WITH_EMAIL": {
       return { ...state, values: action.payload }
@@ -16,16 +28,22 @@ export const login = (state = { userRole: "admin" }, action) => {
       return { ...state, values: action.payload }
     }
     case "LOGIN_WITH_JWT": {
-      return { ...state, values: action.payload, error: null, loading: false }
+      return {
+        ...state,
+        userRole: getUrbainRole(action.payload.loggedInUser, action.payload.agent),
+        values: action.payload,
+        error: null,
+        loading: false
+      }
     }
     case "LOGIN_REQUEST": {
-      return { ...state, error: null, loading: true }
+      return { ...state, userRole: null, values: null, error: null, loading: true }
     }
     case "LOGIN_FAILURE": {
       return { ...state, error: action.payload.message, loading: false }
     }
     case "LOGOUT_WITH_JWT": {
-      return { ...state, values: action.payload, error: null, loading: false }
+      return { ...state, userRole: null, values: action.payload, error: null, loading: false }
     }
     case "LOGOUT_WITH_FIREBASE": {
       return { ...state, values: action.payload }
